@@ -1,3 +1,4 @@
+using BookShopUI;
 using BookShopUI.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -16,7 +17,7 @@ builder.Services
     .AddDefaultUI()
     .AddDefaultTokenProviders();
 builder.Services.AddControllersWithViews();
-
+builder.Services.AddTransient<IHomeRepository, HomeRepository>();
 var app = builder.Build();
 /*using(var scope = app.Services.CreateScope())
 {
