@@ -1,46 +1,56 @@
-﻿@{
+﻿@model BookDisplayModel
+@{
     ViewData["Title"] = "Home Page";
 }
 
 <div class="mb-3">
-    <form class="row row-cols-sm-auto g-3 align-items-center">
+    <form asp-action="Index" class="row row-cols-sm-auto g-3 align-items-center">
   
   <div class="col-12">
-    <label class="visually-hidden" for="inlineFormSelectPref">Genres</label>
-    <select class="form-select" id="genreId">
+    <label class="visually-hidden" for="genreId">Genres</label>
+    <select class="form-select" id="genreId" name="genreId">
       <option selected>Genre...</option>
-      <option value="1">Action</option>
-      <option value="2">Horror</option>
-      <option value="3">Romance</option>
-      <option value="3">ScienceFiction</option>
+                @foreach (var genre in Model.Genres)
+                {
+                 <option selected="@(genre.Id == Model.GenreId)" value="@genre.Id">@genre.GenreName</option>   
+                }
     </select>
   </div>
 
   <div class="col-12">
-    <label class="visually-hidden" for="inlineFormInputGroupUsername">Search by title</label>
+    <label class="visually-hidden" for="sterm">Search by title</label>
     <div class="input-group">
       <div class="input-group-text"></div>
-      <input type="text" class="form-control" id="" placeholder="Search by title">
+      <input type="text" class="form-control" value="@Model.STerm" id="sterm" name="sterm" placeholder="Search by title">
     </div>
   </div>
 
   <div class="col-12">
     <button type="submit" class="btn btn-primary">Search</button>
+    <a href="/Home/Index" type="reset" class="btn btn-outline-primary">Reset</a>
   </div>
 </form>
 </div>
 
 <div class="w-100 d-flex flex-wrap">
-    @for (int i = 0; i < 7; i++)
+    @foreach (var book in Model.Books)
     {
        <div class="card mx-2 mb-2 text-white bg-primary mb-3" style="width: 20rem;">
-            <img src="https://picsum.photos/300/80" class="card-img-top" alt="...">
+            @if (string.IsNullOrEmpty(book.Image))
+            {
+                <img src="https://picsum.photos/300/80?random=@book.Id" class="card-img-top" alt="...">
+  
+            }
+            else
+            {
+                 <img src="/images/@book.Image" class="card-img-top" alt="...">
+            }
       <div class="card-body">
-        <h5 class="card-title">Book title</h5>
+        <h5 class="card-title">@book.BookName</h5>
         <p class="card-text">
-			    Genre:
-				Author:
-                Price:
+            Genre: @book.GenreName<br />
+                Author: @book.AuthorName<br />
+            Price: @book.Price
         </p>
         <a href="#" class="btn btn-success">Add to cart</a>
       </div>
