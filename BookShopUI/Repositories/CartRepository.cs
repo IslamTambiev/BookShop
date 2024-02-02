@@ -102,7 +102,7 @@ namespace BookShopUI.Repositories
         }
         public async Task<int> GetCartItemCount(string userId="")
         {
-            if (!string.IsNullOrEmpty(userId))
+            if (string.IsNullOrEmpty(userId))
             {
                 userId = GetUserId();
             }
