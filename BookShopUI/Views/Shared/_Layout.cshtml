@@ -21,7 +21,7 @@
         <div class="navbar-collapse collapse show" id="navbarColor01" style="">
           <ul class="navbar-nav me-auto">
             <li class="nav-item">
-              <a class="nav-link active" asp-area="" asp-controller="Home" asp-action="Home">Home
+              <a class="nav-link active" asp-area="" asp-controller="Home" asp-action="Index">Home
                 <span class="visually-hidden">(current)</span>
               </a>
             </li>
@@ -64,3 +64,20 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+<script>
+    loadCartCount();
+    async function loadCartCount() { 
+        try {
+            var response = await fetch(`/Cart/GetTotalItemInCart`);
+            if (response.status == 200) {
+                var result = await response.json();
+                console.log(result);
+                var cartCountEl = document.getElementById("cartCount");
+                cartCountEl.innerHTML = result;
+            }
+        }
+        catch (err) {
+            console.log(err);
+        }
+    }
+</script>
