@@ -37,11 +37,13 @@ namespace BookShopUI.Repositories
                     cartItem.Quantity += qty;
                 else
                 {
+                    var book = _db.Books.Find(bookId);
                     cartItem = new CartDetail
                     {
                         BookId = bookId,
                         Quantity = qty,
-                        ShoppingCartId = cart.Id
+                        ShoppingCartId = cart.Id,
+                        UnitPrice = book.Price
                     };
                     _db.CartDetails.Add(cartItem);
                 }
@@ -113,6 +115,54 @@ namespace BookShopUI.Repositories
                               select new { CartDetail.Id })
                               .ToListAsync();
             return data.Count;
+        }
+        public async Task<bool> DoCheckout()
+        {
+            using var transaction = _db.Database.BeginTransaction();
+            try
+            {
+                var userId = GetUserId();
+                if (string.IsNullOrEmpty(userId))
+                    throw new Exception("user is not logged-in");
+                var cart = await GetCart(userId);
+                if (cart is null)
+                    throw new Exception("Invalid cart");
+                var cartDetails = _db.CartDetails
+                    .Where(a => a.ShoppingCartId == cart.Id)
+                    .ToList();
+                if (cartDetails.Count == 0)
+                    throw new Exception("No items in cart");
+                var order = new Order
+                {
+                    UserId = userId,
+                    CreateDate = DateTime.UtcNow,
+                    OrderStatusId = 1
+                };
+                _db.Orders.Add(order);
+                _db.SaveChanges();
+                foreach (var item in cartDetails)
+                {
+                    var orderDetail = new OrderDetail
+                    {
+                        BookId = item.BookId,
+                        OrderId = order.Id,
+                        Quantity = item.Quantity,
+                        UnitPrice = item.UnitPrice
+                    };
+                    _db.OrderDetails.Add(orderDetail);
+                }
+                _db.SaveChanges();
+
+                // removing cartdetails
+                _db.CartDetails.RemoveRange(cartDetails);
+                _db.SaveChanges();
+                transaction.Commit();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
         private string GetUserId()
         {

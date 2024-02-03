@@ -34,12 +34,12 @@ namespace BookShopUI.Controllers
             int cartItem = await _cartRepo.GetCartItemCount();
             return Ok(cartItem);
         }
-        //public async Task<IActionResult> Checkout()
-        //{
-        //    bool isCheckedOut = await _cartRepo.DoCheckout();
-        //    if (!isCheckedOut)
-        //        throw new Exception("Checkout failed");
-        //    return Ok(cartItem);
-        //}
+        public async Task<IActionResult> Checkout()
+        {
+            bool isCheckedOut = await _cartRepo.DoCheckout();
+            if (!isCheckedOut)
+                throw new Exception("checkout failed");
+            return RedirectToAction("Index", "Home");
+        }
     }
 }
