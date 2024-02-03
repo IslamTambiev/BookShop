@@ -25,6 +25,7 @@ namespace BookShopUI.Repositories
             if(string.IsNullOrEmpty(userId))
                 throw new Exception("user is not logged-in");
             var orders = await _db.Orders
+                .Include(x => x.OrderStatus)
                 .Include(x => x.OrderDetail)
                 .ThenInclude(x => x.Book)
                 .ThenInclude(x => x.Genre)
